@@ -1,4 +1,4 @@
 [submodule "readMe"]
 	path = readMe
 	url = git@github.com:zkd-11/all_read.git
-	branch = master
+	branch = main
