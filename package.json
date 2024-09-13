@@ -1,0 +1,22 @@
+{
+  "name": "test_pro_0",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zkd-11/test_pro_0.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zkd-11/test_pro_0/issues"
+  },
+  "homepage": "https://github.com/zkd-11/test_pro_0#readme",
+  "dependencies": {
+    "husky": "^8.0.0"
+  }
+}
