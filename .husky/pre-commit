@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "更新子模块.."
-exit 1
-git submodule update --remote
+# echo "更新子模块.."
+# exit 1
+# git submodule update --remote
 
