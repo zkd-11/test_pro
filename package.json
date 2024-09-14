@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,7 +17,7 @@
     "url": "https://github.com/zkd-11/test_pro_0/issues"
   },
   "homepage": "https://github.com/zkd-11/test_pro_0#readme",
-  "dependencies": {
-    "husky": "^8.0.0"
+  "devDependencies": {
+    "husky": "^8.0.3"
   }
 }
