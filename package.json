@@ -7,9 +7,11 @@
     "prepare": "husky install",
     "up-sub": "./up_submodules.sh true"
   },
-  "submodules": [
-    "readMe"
-  ],
+  "husky": {
+    "hooks": {
+      "post-merge": "./up_submodules.sh"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zkd-11/test_pro_0.git"
