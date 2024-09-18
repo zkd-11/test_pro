@@ -37,6 +37,7 @@ check_submodule_exists() {
 # 函数：检查子模块是否需要更新
 submodule_needs_update() {
     cd "$1"
+    git fetch
     local remote=$(git config --get remote.origin.url)
     local remote_commit=$(git rev-parse origin/main)
     local local_commit=$(git rev-parse head)
@@ -46,6 +47,7 @@ submodule_needs_update() {
         styled_echo 34 "当前git历史已为最新，跳过拉取代码~"
         return 1 # 不需要更新
     else
+        styled_echo 34 "当前git历史落后远程仓库，更新中.."
         return 0 # 需要更新
     fi
 }
@@ -54,7 +56,8 @@ submodule_needs_update() {
 update_submodule() {
     local submodule_name=$1
     local add_changes=$2  # 第二个参数，决定是否添加更改，默认为 "false"
-    local need_update_parent=1  # 假设默认不需要更新父模块
+    local need_update_parent=1  # 默认不需要更新父模块
+    local sub_commit_message=${3:-"更新子模块 $submodule_name"} # 子模块更新内容备注更新备注
 
     # 检查子模块是否需要更新
     if submodule_needs_update "$submodule_name"; then
@@ -67,12 +70,12 @@ update_submodule() {
     cd "$submodule_name"
 
     # 检查子模块是否有未提交的更改
-    if git status --porcelain | grep -q '\S' && [ "$need_update_parent" -eq 1 ]; then
+    if git status --porcelain | grep -q '\S' && [ $add_changes = true ]; then
+    
         echo "添加更改 ..."
         git add .
 
-        echo "提交更改..."
-        if ! git commit -m "更新子模块 $submodule_name"; then
+        if ! git commit -m "$sub_commit_message"; then
             echo "提交失败，跳过推送"
             cd ..
             return 1
@@ -81,10 +84,12 @@ update_submodule() {
         echo "推送更改到远程仓库..."
         git push origin HEAD:main
         need_update_parent=0  # 需要更新父模块
+    elif [ $add_changes = true ]; then
+        styled_echo 32 "子模块 $submodule_name 并未存在需要提交的文件"
     fi
 
-    cd ..
     if [ "$need_update_parent" -eq 0 ]; then
+        cd ..
         echo "更新父项目中的子模块引用哈希..."
         git add "$submodule_name"
         if ! git commit -m "chore(auto): 更新子模块 $submodule_name 引用"; then
@@ -92,9 +97,9 @@ update_submodule() {
             return 1
         fi
         git push
-        echo -e "\033[1;32m更新完成!\033[0m"
+        styled_echo 32 "更新完成!"
     else
-        styled_echo 32 "子模块 $submodule_name 并未存在需要提交的文件"
+        styled_echo 32 "子仓库与远程仓库数据已保持一致, 暂不需要更新!"
     fi
 }
 
@@ -102,13 +107,23 @@ update_submodule() {
 # 主函数
 main() {
     check_git_repo
-    # 仅引入一个子模块， 固定使用
-    local submodule_name="readMe"
+    local submodule_name="readMe" # 仅引入一个子模块， 固定使用
     local add_changes=${1:-"false"}  # 默认值为 "false" 更新子模块模式
-    echo $add_changes
+    local sub_commit_message # 子模块更新内容备注更新备注
+
+    if [ "$add_changes" = "true" ]; then
+        # 清空屏幕
+        clear
+        # 获取用户输入的提交信息
+        styled_echo 34 "请输入子模块更新的commmit提交信息(未输入时将使用默认文案)："
+        read -r sub_commit_message
+        styled_echo 33 "您输入的提交信息为: $sub_commit_message"
+        styled_echo 33 "按任意键继续，或 Ctrl+C 退出。"
+        read -r confirmation
+    fi
 
     check_submodule_exists "$submodule_name"
-    update_submodule "$submodule_name" "$add_changes"
+    update_submodule "$submodule_name" "$add_changes" "$sub_commit_message"
 }
 
 # 运行主函数
