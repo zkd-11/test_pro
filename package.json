@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "up-sub": "./update_submodules.sh"
+    "up-sub": "./up_submodules.sh true"
   },
   "submodules": [
     "readMe"
