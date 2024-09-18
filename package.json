@@ -9,7 +9,7 @@
   },
   "husky": {
     "hooks": {
-      "post-merge": "./up_submodules.sh"
+      "pre-push": "./up_submodules.sh"
     }
   },
   "repository": {
