@@ -96,7 +96,7 @@ update_submodule() {
             echo "提交失败，跳过推送"
             return 1
         fi
-        git push
+        git push --no-verify
         styled_echo 32 "更新完成!"
     else
         styled_echo 32 "子仓库与远程仓库数据已保持一致, 暂不需要更新!"
