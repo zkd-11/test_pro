@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "up-sub": "./update_submodules.sh"
   },
+  "submodules": [
+    "readMe"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zkd-11/test_pro_0.git"

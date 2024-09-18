@@ -19,30 +19,32 @@ check_submodule_exists() {
     fi
 }
 
-# 函数：从 package.json 读取子模块列表
-read_submodules_from_json() {
-    if [ ! -f "package.json" ]; then
-        echo "错误：package.json 文件不存在"
-        exit 1
-    fi
-    
-
-    # submodules=$('readMe')
-    # 使用 grep 和 sed 从 package.json 中提取子模块列表，忽略大小写
-    submodules=$(grep -i '"submodules"' package.json | sed -E 's/.*"submodules": *(\[.*\]).*/\1/' | sed 's/[",]//g')
-    echo $submodules 
-    if [ -z "$submodules" ]; then
-        echo "错误：在 package.json 中没有找到 submodules 数组或数组为空"
-        exit 1
+# 函数：检查子模块是否需要更新
+submodule_needs_update() {
+    cd "$1"
+    local remote=$(git config --get remote.origin.url)
+    local remote_commit=$(git rev-parse origin/main)
+    local local_commit=$(git rev-parse HEAD)
+    echo -e "$remote \n 远程$remote_commit \n 本地$local_commit \n"
+    cd ..
+    if [ "$remote_commit" == "$local_commit" ]; then
+        return 1 # 不需要更新
+    else
+        return 0 # 需要更新
     fi
 }
 
-# 主要更新流程
+# 更新流程
 update_submodule() {
-    local submodule_name=readMe
+    local submodule_name=$1
+
+    if ! submodule_needs_update "$submodule_name"; then
+        echo "子模块 '$submodule_name'不需要更新"
+        return
+    fi
 
     echo "正在更新子模块 $submodule_name ..."
-    git submodule update --remote --merge --recursive
+    git submodule update --remote --merge --recursive "$submodule_name"
 
     echo "进入子模块目录 $submodule_name ..."
     cd "$submodule_name"
@@ -54,28 +56,22 @@ update_submodule() {
     git commit -m "更新子模块 $submodule_name" || true
 
     echo "推送更改到远程仓库..."
-    git push
+    git push origin HEAD:main
 
     echo "返回父目录..."
     cd ..
 
     echo "更新父项目中的子模块引用..."
     git add "$submodule_name"
-    git commit -m "更新子模块 $submodule_name 引用" || true
+    git commit -m "chore(auto): 更新子模块 $submodule_name 引用" || true
     git push
 }
 
 # 主函数
 main() {
     check_git_repo
-    read_submodules_from_json
-
-    for submodule_name in $submodules; do
-        check_submodule_exists "$submodule_name"
-        update_submodule "$submodule_name"
-    done
-
-    echo "所有子模块更新完成！"
+    check_submodule_exists "readMe"
+    update_submodule "readMe"
 }
 
 # 运行主函数
