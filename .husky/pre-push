@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
-echo 'push前拦截'
-chmod +x "../up_submodules.sh"
-sh "../up_submodules.sh"
+echo 'push前拦截，更新子模块'
+sh "./up_submodules.sh"
